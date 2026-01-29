@@ -25,6 +25,23 @@ struct analog {
 	 button btn; 
 }; 
 
+byte readAnalogAxisLevel(int pin) 
+{ 
+	 return map(analogRead(pin), 0, 1023, 0, 1023); 
+} 
+	 
+bool isAnalogButtonPressed(int pin) 
+{ 
+	 return digitalRead(pin) == 0; 
+} 
+
+void releaseKeys() {
+  Keyboard.release(218);
+  Keyboard.release(217);
+  Keyboard.release(215);
+  Keyboard.release(216);
+}
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -48,12 +65,14 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   bool anyButtonPressed = false;
+  bool isJoystickDead = false;
 
   if ( (digitalRead(Wpin) == LOW) || (digitalRead(Apin) == LOW) || (digitalRead(Spin) == LOW) || (digitalRead(Dpin) == LOW) ) {
     anyButtonPressed = true;
   } else {
     anyButtonPressed = false;
   }
+
    analog analog; 
 	 
     analog.x = readAnalogAxisLevel(ANALOG_X_PIN); 
@@ -61,16 +80,22 @@ void loop() {
     
     analog.btn.pressed = isAnalogButtonPressed(ANALOG_BUTTON_PIN); 
     
-    
 
-    int deadzone_max = 250; // Change to the maximum value seen when joystick is at rest
-    int deadzone_min = 5;  // Change to the minimum value seen when joystick is at rest
+    int deadzone_max = 254; // Change to the maximum value seen when joystick is at rest
+    int deadzone_min = 1;  // Change to the minimum value seen when joystick is at rest
 
+    // for greater precision
     int deadzoneX_max = 200; // Change to the maximum X-value seen when joystick is at rest
     int deadzoneX_min = 50;  // Change to the minimum X-value seen when joystick is at rest
 
     int deadzoneY_max = 200; // Change to the maximum Y-value seen when joystick is at rest
     int deadzoneY_min = 50;  // Change to the minimum Y-value seen when joystick is at rest
+
+    if ((analog.x > deadzone_min) && (analog.y > deadzone_min) && (analog.x < deadzone_max) && (analog.y < deadzone_max)) {
+      isJoystickDead = true;
+    } else {
+      isJoystickDead = false;
+    }
 
   if(Keyboard.isConnected()) {
 
@@ -85,67 +110,57 @@ void loop() {
     if (digitalRead(Wpin) == LOW) {
       Keyboard.press(119); // w
       Serial.println("W");
-      // while(digitalRead(Wpin) == LOW); 
-      // Keyboard.release(119);
       delay(150);
 
     } else if (digitalRead(Apin) == LOW) {
       Keyboard.press(97); // a
       Serial.println("A");
-      // while(digitalRead(Apin) == LOW); // STOPS here until you release the button
-      // Keyboard.release(97);
-      delay(150);
+      delay(15);
 
     } else if (digitalRead(Spin) == LOW) {
       Keyboard.press(115); // s
       Serial.println("S");
-      // while(digitalRead(Spin) == LOW); // STOPS here until you release the button
-      // Keyboard.release(115);
-      delay(150);
+      delay(15);
 
     } else if (digitalRead(Dpin) == LOW) {
       Keyboard.press(100); // d
       Serial.println("D");
-      // while(digitalRead(Dpin) == LOW); // STOPS here until you release the button
-      // Keyboard.release(100);
-      delay(150);
+      delay(15);
 
-    } else {
-      if ( (!anyButtonPressed) && (analog.x > deadzone_max) ){
-        
-        Keyboard.press(218); // up arrow -> look up
+    } 
+    
+    if (analog.x > deadzone_max) {
+      
+      Keyboard.press(218); // up arrow -> look up
 
-      } else if ( (!anyButtonPressed) && (analog.x < deadzone_min)) {
-        
-        Keyboard.press(217); // down arrow -> look down
+    } if (analog.x < deadzone_min) {
+      
+      Keyboard.press(217); // down arrow -> look down
 
-      } 
-      else if ( (!anyButtonPressed) && (analog.y > deadzone_max) ){
-       
-        Keyboard.press(215); // right arrow -> look right
+    } 
+    if (analog.y > deadzone_max) {
+      
+      Keyboard.press(215); // right arrow -> look right
 
-      } else if ( (!anyButtonPressed) && (analog.y < deadzone_min)) {
-        
-        Keyboard.press(216); // left arrow -> look left
+    } 
+    if (analog.y < deadzone_min) {
+      
+      Keyboard.press(216); // left arrow -> look left
 
-      } 
-      else {
-        
-        Keyboard.releaseAll();
-      }
+    } 
+
+    if (analog.btn.pressed) {
+      Keyboard.press(0x20); // space bar -> jump
     }
+    
+    if (!anyButtonPressed && isJoystickDead) {
+      Keyboard.releaseAll();
+    } else if (isJoystickDead) {
+      releaseKeys();
+    } 
     delay(100);
   }
 }
 
-byte readAnalogAxisLevel(int pin) 
-{ 
-	 return map(analogRead(pin), 0, 1023, 0, 1023); 
-} 
-	 
-bool isAnalogButtonPressed(int pin) 
-{ 
-	 return digitalRead(pin) == 0; 
-} 
 
 
