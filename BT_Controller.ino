@@ -3,17 +3,28 @@
 //BleComboKeyboard Keyboard("BT-Controller");
 //BleComboMouse Mouse;
 
-const int Wpin = 27;
-const int Apin = 14;
-const int Spin = 12;
-const int Dpin = 13;
-const int ANALOG_X_PIN = 34;
-const int ANALOG_Y_PIN = 35;
-const int ANALOG_BUTTON_PIN = 32;
+#define Wpin 27
+#define Apin 14
+#define Spin 12
+#define Dpin 13
 
-//Default values when axis not actioned 
-#define ANALOG_X_CORRECTION 128
-#define ANALOG_Y_CORRECTION 128
+#define ANALOG_X_PIN_RS 34
+#define ANALOG_Y_PIN_RS 35
+#define ANALOG_BUTTON_PIN_RS 32
+
+#define ANALOG_X_PIN_LS 26
+#define ANALOG_Y_PIN_LS 25
+#define ANALOG_BUTTON_PIN_LS 33
+
+const int deadzone_max = 253; // Change to the maximum value seen when joystick is at rest
+const int deadzone_min = 2;  // Change to the minimum value seen when joystick is at rest
+
+// for greater precision
+const int deadzoneX_max = 200; // Change to the maximum X-value seen when joystick is at rest
+const int deadzoneX_min = 50;  // Change to the minimum X-value seen when joystick is at rest
+
+const int deadzoneY_max = 200; // Change to the maximum Y-value seen when joystick is at rest
+const int deadzoneY_min = 50;  // Change to the minimum Y-value seen when joystick is at rest
 	 
 struct button { 
 	 byte pressed = 0; 
@@ -24,23 +35,6 @@ struct analog {
 	 
 	 button btn; 
 }; 
-
-byte readAnalogAxisLevel(int pin) 
-{ 
-	 return map(analogRead(pin), 0, 1023, 0, 1023); 
-} 
-	 
-bool isAnalogButtonPressed(int pin) 
-{ 
-	 return digitalRead(pin) == 0; 
-} 
-
-void releaseKeys() {
-  Keyboard.release(218);
-  Keyboard.release(217);
-  Keyboard.release(215);
-  Keyboard.release(216);
-}
 
 void setup() {
   // put your setup code here, to run once:
@@ -55,7 +49,9 @@ void setup() {
  
 
   // joystick config
-  pinMode(ANALOG_BUTTON_PIN, INPUT_PULLUP); 
+  pinMode(ANALOG_BUTTON_PIN_RS, INPUT_PULLUP); 
+  pinMode(ANALOG_BUTTON_PIN_LS, INPUT_PULLUP); 
+
 
   Keyboard.begin();
   Mouse.begin();
@@ -65,7 +61,6 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   bool anyButtonPressed = false;
-  bool isJoystickDead = false;
 
   if ( (digitalRead(Wpin) == LOW) || (digitalRead(Apin) == LOW) || (digitalRead(Spin) == LOW) || (digitalRead(Dpin) == LOW) ) {
     anyButtonPressed = true;
@@ -73,38 +68,37 @@ void loop() {
     anyButtonPressed = false;
   }
 
-   analog analog; 
+   analog analogRS;
+   analog analogLS; 
 	 
-    analog.x = readAnalogAxisLevel(ANALOG_X_PIN); 
-    analog.y = readAnalogAxisLevel(ANALOG_Y_PIN); 
+    analogRS.x = readAnalogAxisLevel(ANALOG_X_PIN_RS); 
+    analogRS.y = readAnalogAxisLevel(ANALOG_Y_PIN_RS); 
+
+    analogLS.x = readAnalogAxisLevel(ANALOG_X_PIN_LS); 
+    analogLS.y = readAnalogAxisLevel(ANALOG_Y_PIN_LS);
     
-    analog.btn.pressed = isAnalogButtonPressed(ANALOG_BUTTON_PIN); 
-    
-
-    int deadzone_max = 254; // Change to the maximum value seen when joystick is at rest
-    int deadzone_min = 1;  // Change to the minimum value seen when joystick is at rest
-
-    // for greater precision
-    int deadzoneX_max = 200; // Change to the maximum X-value seen when joystick is at rest
-    int deadzoneX_min = 50;  // Change to the minimum X-value seen when joystick is at rest
-
-    int deadzoneY_max = 200; // Change to the maximum Y-value seen when joystick is at rest
-    int deadzoneY_min = 50;  // Change to the minimum Y-value seen when joystick is at rest
-
-    if ((analog.x > deadzone_min) && (analog.y > deadzone_min) && (analog.x < deadzone_max) && (analog.y < deadzone_max)) {
-      isJoystickDead = true;
-    } else {
-      isJoystickDead = false;
-    }
+    analogRS.btn.pressed = isAnalogButtonPressed(ANALOG_BUTTON_PIN_RS);
+    analogLS.btn.pressed = isAnalogButtonPressed(ANALOG_BUTTON_PIN_LS); 
 
   if(Keyboard.isConnected()) {
 
-    Serial.print("X:"); 
-    Serial.print(analog.x); 
-    Serial.print("   ");
+    Serial.print("X_RS:"); 
+    Serial.print(analogRS.x);
+
+    Serial.print("\t");
     
-    Serial.print("Y:"); 
-    Serial.println(analog.y);
+    Serial.print("Y_RS:"); 
+    Serial.print(analogRS.y);
+
+    Serial.print("\t");
+
+    Serial.print("X_LS:"); 
+    Serial.print(analogLS.x); 
+
+    Serial.print("\t");
+
+    Serial.print("Y_LS:"); 
+    Serial.println(analogLS.y);
 
     // BUTTONS
     if (digitalRead(Wpin) == LOW) {
@@ -128,39 +122,100 @@ void loop() {
       delay(15);
 
     } 
-    
-    if (analog.x > deadzone_max) {
+    // JOYSTICK RS
+    if (analogRS.x > deadzone_max) {
       
       Keyboard.press(218); // up arrow -> look up
 
-    } if (analog.x < deadzone_min) {
+    } if (analogRS.x < deadzone_min) {
       
       Keyboard.press(217); // down arrow -> look down
 
     } 
-    if (analog.y > deadzone_max) {
+    if (analogRS.y > 200) {
       
       Keyboard.press(215); // right arrow -> look right
 
     } 
-    if (analog.y < deadzone_min) {
+    if (analogRS.y < deadzone_min) {
       
       Keyboard.press(216); // left arrow -> look left
 
     } 
 
-    if (analog.btn.pressed) {
-      Keyboard.press(0x20); // space bar -> jump
+    if (analogRS.btn.pressed) {
+      Keyboard.press(KEY_LEFT_SHIFT); // left shift -> sneak
+    } else {
+      Keyboard.release(KEY_LEFT_SHIFT);
     }
-    
-    if (!anyButtonPressed && isJoystickDead) {
-      Keyboard.releaseAll();
-    } else if (isJoystickDead) {
-      releaseKeys();
+
+    // JOYSTICK LS
+    if (analogLS.x > deadzone_max) {
+      
+      Keyboard.press(119); // w -> move forward
+
+    } if (analogLS.x < deadzone_min) {
+      
+      Keyboard.press(115); // s -> move backward
+
     } 
+    if (analogLS.y > deadzone_max) {
+      
+      Keyboard.press(100); // d -> strafe right
+
+    } 
+    if (analogLS.y < deadzone_min) {
+      
+      Keyboard.press(97); // a -> strafe left
+
+    } 
+
+    if (analogLS.btn.pressed) {
+      Keyboard.press(0x20); // space bar -> jump
+    } else {
+      Keyboard.release(0x20);
+    }
+
+    if (!anyButtonPressed && isJoystickDead(analogRS) && isJoystickDead(analogLS)) {
+      Keyboard.releaseAll();
+    } else if (isJoystickDead(analogRS)) {
+      releaseRS();
+    } else if (isJoystickDead(analogRS)) {
+      releaseLS();
+    }
     delay(100);
   }
 }
 
+byte readAnalogAxisLevel(int pin) 
+{ 
+	 return map(analogRead(pin), 0, 1023, 0, 1023); 
+} 
+	 
+bool isAnalogButtonPressed(int pin) 
+{ 
+	 return digitalRead(pin) == 0; 
+} 
 
+bool isJoystickDead(analog analog) {
+  if ((analog.x > deadzone_min) && (analog.y > deadzone_min) && (analog.x < deadzone_max) && (analog.y < deadzone_max)) {
+      return true;
+    } else {
+      return false;
+    }
+}
+
+void releaseRS() {
+  Keyboard.release(218);
+  Keyboard.release(217);
+  Keyboard.release(215);
+  Keyboard.release(216);
+}
+
+void releaseLS() {
+  Keyboard.release(119);
+  Keyboard.release(97);
+  Keyboard.release(115);
+  Keyboard.release(100);
+}
 
