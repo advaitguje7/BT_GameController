@@ -61,6 +61,7 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   bool anyButtonPressed = false;
+  bool isShiftPressed = false;
 
   if ( (digitalRead(Wpin) == LOW) || (digitalRead(Apin) == LOW) || (digitalRead(Spin) == LOW) || (digitalRead(Dpin) == LOW) ) {
     anyButtonPressed = true;
@@ -81,6 +82,8 @@ void loop() {
     analogLS.btn.pressed = isAnalogButtonPressed(ANALOG_BUTTON_PIN_LS); 
 
   if(Keyboard.isConnected()) {
+
+    bool isShiftPressed = false;
 
     Serial.print("X_RS:"); 
     Serial.print(analogRS.x);
@@ -145,8 +148,7 @@ void loop() {
 
     if (analogRS.btn.pressed) {
       Keyboard.press(KEY_LEFT_SHIFT); // left shift -> sneak
-    } else {
-      Keyboard.release(KEY_LEFT_SHIFT);
+      isShiftPressed = true;
     }
 
     // JOYSTICK LS
@@ -178,6 +180,9 @@ void loop() {
 
     if (!anyButtonPressed && isJoystickDead(analogRS) && isJoystickDead(analogLS)) {
       Keyboard.releaseAll();
+      if (isShiftPressed) {
+        Keyboard.press(KEY_LEFT_SHIFT);
+      }
     } else if (isJoystickDead(analogRS)) {
       releaseRS();
     } else if (isJoystickDead(analogRS)) {
@@ -218,4 +223,5 @@ void releaseLS() {
   Keyboard.release(115);
   Keyboard.release(100);
 }
+
 
