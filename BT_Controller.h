@@ -26,34 +26,31 @@
 #define NUM_BUTTONS 4
 #define DELAY 10 // ms
 
+enum buttonType {
+    TAPPED,
+    TOGGLED,
+};
+struct Pin {
+    std::string name;
+    int pin;
+    buttonType type;
+    bool firstCall;
+};
 
 struct Application {
 
     // Controls
-    int abxyButtons[4];
-    int abxyCommands[4];
-    int triggerButtons[2];
-    int backButtons[2];
-    int dpadButtons[4];
-    int joystickButtons[2];
+    Pin aButton;
+    // int abxyCommands[4];
+    // int triggerButtons[2];
+    // int backButtons[2];
+    // int dpadButtons[4];
+    // int joystickButtons[2];
 
-    // Bools
-    bool FirstCall_A;
-    bool FirstCall_B;
-    bool FirstCall_X;
-    bool FirstCall_Y;
 
-    bool FirstCall_LT;
-    bool FirstCall_RT;
-
-    bool FirstCall_LB;
-    bool FirstCall_RB;
-
-    bool FirstCall_DPadUp;
-    bool FirstCall_DPadDown;
-    bool FirstCall_DPadLeft;
-    bool FirstCall_DPadRight;
 };
+
+
 
 Application Application_construct();
 Application Application_loop();

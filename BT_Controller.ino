@@ -1,5 +1,6 @@
 #include "BT_Controller.h"
 #include <BleKeyboard.h>
+#include <string>
 
 
 BleKeyboard bleKeyboard("BT_GameController", "Manufacturer", 100);
@@ -9,43 +10,42 @@ Application Application_construct() {
     int i;
 
     // Controls
-    app.abxyButtons[0] = aPin;
-    app.abxyButtons[1] = bPin;
-    app.abxyButtons[2] = xPin;
-    app.abxyButtons[3] = yPin;
+    app.aButton.name = "aButton";
+    app.aButton.pin = aPin;
+    app.aButton.type = TAPPED;
+    app.aButton.firstCall = false;
 
-    app.abxyCommands[0] = aCommand;
-    app.abxyCommands[1] = bCommand;
-    app.abxyCommands[2] = xCommand;
-    app.abxyCommands[3] = yCommand;
+    app.bButton.name = "bButton";
+    app.bButton.pin = bPin;
+    app.bButton.type = TAPPED;
+    app.bButton.firstCall = false;
 
-    app.triggerButtons[0] = leftTriggerPin;
-    app.triggerButtons[1] = rightTriggerPin;
+    app.xButton.name = "xButton";
+    app.xButton.pin = xPin;
+    app.xButton.type = TOGGLED;
+    app.xButton.firstCall = false;
+    // app.abxyButtons[0] = aPin;
+    // app.abxyButtons[1] = bPin;
+    // app.abxyButtons[2] = xPin;
+    // app.abxyButtons[3] = yPin;
 
-    app.backButtons[0] = leftButtonPin;
-    app.backButtons[1] = rightButtonPin;
+    // app.abxyCommands[0] = aCommand;
+    // app.abxyCommands[1] = bCommand;
+    // app.abxyCommands[2] = xCommand;
+    // app.abxyCommands[3] = yCommand;
 
-    app.dpadButtons[0] = dpadUpPin;
-    app.dpadButtons[1] = dpadRightPin;
-    app.dpadButtons[2] = dpadDownPin;
-    app.dpadButtons[3] = dpadLeftPin;
+    // app.triggerButtons[0] = leftTriggerPin;
+    // app.triggerButtons[1] = rightTriggerPin;
 
-    // Bools
-    app.FirstCall_A = false;
-    app.FirstCall_B = false;
-    app.FirstCall_X = false;
-    app.FirstCall_Y = false;
+    // app.backButtons[0] = leftButtonPin;
+    // app.backButtons[1] = rightButtonPin;
 
-    app.FirstCall_LT = false;
-    app.FirstCall_RT = false;
+    // app.dpadButtons[0] = dpadUpPin;
+    // app.dpadButtons[1] = dpadRightPin;
+    // app.dpadButtons[2] = dpadDownPin;
+    // app.dpadButtons[3] = dpadLeftPin;
 
-    app.FirstCall_LB = false;
-    app.FirstCall_RB = false;
-
-    app.FirstCall_DPadUp = false;
-    app.FirstCall_DPadDown = false;
-    app.FirstCall_DPadLeft = false;
-    app.FirstCall_DPadRight = false;
+   
 
     return app;
 }
@@ -54,10 +54,10 @@ void setup() {
   Serial.begin(115200);
   bleKeyboard.begin();
 
-  pinMode(aPin, INPUT_PULLUP);
-  pinMode(bPin, INPUT_PULLUP);
-  pinMode(xPin, INPUT_PULLUP);
-  pinMode(yPin, INPUT_PULLUP);
+  // pinMode(aPin, INPUT_PULLUP);
+  // pinMode(bPin, INPUT_PULLUP);
+  // pinMode(xPin, INPUT_PULLUP);
+  // pinMode(yPin, INPUT_PULLUP);
 }
 
 
@@ -65,7 +65,7 @@ Application app = Application_construct();
 void loop() {
 
   if (bleKeyboard.isConnected()) {
-    readWriteABXY(&app);
+    // readWriteABXY(&app);
   }
   Serial.println("Disconnected");
 }
@@ -84,12 +84,25 @@ void readWriteABXY(Application* app) {
   }
 }
 
-void tap_button(int command) {
+
+void tap_button(Pin pin, int command) {
+  if (pin.type != TAPPED) return;
   bleKeyboard.press(command);
   delay(100);
   bleKeyboard.release(command);
 }
 
-void toggle_button(int pin,int command) {
-  // TODO
+
+void toggle_button(Pin pin, int command) {
+  if (pin.type != TOGGLED) return;
+
+  if (pin.firstCall == false) {
+    bleKeyboard.press(command);
+    pin.firstCall = true;
+  } else {
+    bleKeyboard.release(command);
+    pin.firstCall = false;
+  }
+  
 }
+
