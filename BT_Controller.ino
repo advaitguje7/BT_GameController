@@ -24,18 +24,17 @@ Application Application_construct() {
     app.xButton.pin = xPin;
     app.xButton.type = TOGGLED;
     app.xButton.firstCall = false;
-    // app.abxyButtons[0] = aPin;
-    // app.abxyButtons[1] = bPin;
-    // app.abxyButtons[2] = xPin;
-    // app.abxyButtons[3] = yPin;
 
-    // app.abxyCommands[0] = aCommand;
-    // app.abxyCommands[1] = bCommand;
-    // app.abxyCommands[2] = xCommand;
-    // app.abxyCommands[3] = yCommand;
+    app.leftButton.name = "leftButton";
+    app.leftButton.pin = leftButtonPin;
+    app.leftButton.type = TAPPED;
+    app.leftButton.firstCall = false;
 
-    // app.triggerButtons[0] = leftTriggerPin;
-    // app.triggerButtons[1] = rightTriggerPin;
+    app.rightButton.name = "rightButton";
+    app.rightButton.pin = rightButtonPin;
+    app.rightButton.type = TAPPED;
+    app.rightButton.firstCall = false;
+
 
     // app.backButtons[0] = leftButtonPin;
     // app.backButtons[1] = rightButtonPin;
@@ -54,10 +53,14 @@ void setup() {
   Serial.begin(115200);
   bleKeyboard.begin();
 
-  // pinMode(aPin, INPUT_PULLUP);
-  // pinMode(bPin, INPUT_PULLUP);
-  // pinMode(xPin, INPUT_PULLUP);
-  // pinMode(yPin, INPUT_PULLUP);
+  pinMode(aPin, INPUT_PULLUP);
+  pinMode(bPin, INPUT_PULLUP);
+  pinMode(xPin, INPUT_PULLUP);
+  pinMode(yPin, INPUT_PULLUP);
+
+  pinMode(leftButtonPin, INPUT_PULLUP);
+  pinMode(rightButtonPin, INPUT_PULLUP);
+
 }
 
 
@@ -65,44 +68,56 @@ Application app = Application_construct();
 void loop() {
 
   if (bleKeyboard.isConnected()) {
-    // readWriteABXY(&app);
+    readWriteABXY(&app);
   }
-  Serial.println("Disconnected");
 }
 
 void readWriteABXY(Application* app) {
-  if (digitalRead(aPin) == LOW) {
-    tap_button(aCommand);
+  if (isTapped(app->aButton.num)) {
+    tap_button(&app->aButton, aCommand);
+    Serial.println("A");
   }
 
-  if (digitalRead(bPin) == LOW) {
-    tap_button(bCommand);
+  if (isTapped(app->bButton.num)) {
+    tap_button(&app->bButton, bCommand);
+    Serial.println("B");
+
   }
 
-  if (digitalRead(xPin) == LOW) {
-    toggle_button(xCommand);
+  if (isTapped(app->xButton.num)) {
+    toggle_button(&app->xButton, xCommand);
+    Serial.println("X");
   }
 }
 
+bool isTapped(Pin* pin) { return (!digitalRead(pin->num)); }
 
-void tap_button(Pin pin, int command) {
-  if (pin.type != TAPPED) return;
+void tap_button(Pin* pin, int command) {
+  if (pin->type != TAPPED) return;
+
   bleKeyboard.press(command);
-  delay(100);
+  delay(50);
   bleKeyboard.release(command);
 }
 
 
-void toggle_button(Pin pin, int command) {
-  if (pin.type != TOGGLED) return;
+void toggle_button(Pin* pin, int command) {
+  if (pin->type != TOGGLED) return;
 
-  if (pin.firstCall == false) {
+  if (pin->firstCall == false) {
     bleKeyboard.press(command);
-    pin.firstCall = true;
+    delay(50);
+    pin->firstCall = true;
   } else {
     bleKeyboard.release(command);
-    pin.firstCall = false;
+    pin->firstCall = false;
   }
   
+}
+
+void readWriteBackButtons(Application* app) {
+  if (isTapped(app->leftButton) {
+    tapButton(&app->leftButton, leftButtonCommand);
+  }
 }
 

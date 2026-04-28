@@ -1,3 +1,22 @@
+/* TODO
+-> Joysticks
+-> Back Buttons
+-> Dpad
+-> Triggers
+*/
+
+/* Questions 
+-> For commands, is it better to define or initialize in construct?
+-> Is it still spagetti code?
+*/
+
+/* Features
+-> Edge case robustness (if != type, return)
+-> Separate toggled and tapped functions (modular)
+-> Pin struct
+-> Debounce (delay(50) ) 
+*/
+
 // Buttons
 #define aPin 27
 #define bPin 13
@@ -7,8 +26,11 @@
 // Button Commands
 #define aCommand 32 // 0x20 | jump
 #define bCommand 122 // drop item
-#define xCommand 99; // inventory
+#define xCommand 99 // inventory
 #define yCommand 0 // undetermined
+
+#define leftButtonCommand 0
+#define rightButtonCommand 0
 
 // D-pad
 #define dpadUpPin 21
@@ -32,7 +54,7 @@ enum buttonType {
 };
 struct Pin {
     std::string name;
-    int pin;
+    int num;
     buttonType type;
     bool firstCall;
 };
@@ -41,6 +63,12 @@ struct Application {
 
     // Controls
     Pin aButton;
+    Pin bButton;
+    Pin xButton;
+    Pin yButton;
+
+    Pin leftButton;
+    Pin rightButton;
     // int abxyCommands[4];
     // int triggerButtons[2];
     // int backButtons[2];
@@ -50,16 +78,17 @@ struct Application {
 
 };
 
-
-
 Application Application_construct();
 Application Application_loop();
 
-// reads the action buttons and executes the according command
+// Returns if the button was tapped
+bool isTapped(Pin* pin);
+
+// reads the action buttons and executes its according command
 void readWriteABXY(Application* app);
 
-// reads the back buttons and returns which one was pressed
-int readBackButtons(Application* app);
+// reads the back buttons and executes its respective command
+void readWriteBackButtons(Application* app);
 
 // reads the D-Pad buttons and returns which one was pressed
 int readDPad(Application* app);
