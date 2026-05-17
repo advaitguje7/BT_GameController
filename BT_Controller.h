@@ -11,10 +11,10 @@
 */
 
 /* Features
--> Edge case robustness (if != type, return)
--> Separate toggled and tapped functions (modular)
--> Button struct
--> Debounce (delay(50) ) 
+-> Edge case robustness (if != type, return) [x]
+-> Separate toggled and tapped functions (modular) [x]
+-> Button struct [x]
+-> Debounce (delay(50) ) [x]
 */
 #include "Buttons.h"
 /*Action Buttons*/
@@ -63,11 +63,11 @@ typedef struct Application {
     Button xButton;
     Button yButton;
 
-    Button leftTrigger;
-    Button rightTrigger;
+    // Button leftTrigger;
+    // Button rightTrigger;
 
-    Button leftButton;
-    Button rightButton;
+    // Button leftButton;
+    // Button rightButton;
 } Application;
 
 Application Application_construct();
@@ -98,10 +98,10 @@ void readWriteDPad(Application* app);
 void readJoystickButtons(Application* app);
 
 // taps the button
-void tap_button(Button* pin, int command);
+void tap_button(Button* pin);
 
 // toggles the button
-void toggle_button(Button* pin, int command);
+void toggle_button(Button* pin);
 
 // presses the button
-void press_button(Button* pin, int command);
+void press_button(Button* pin);

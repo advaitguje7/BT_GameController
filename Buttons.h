@@ -6,9 +6,7 @@
 
 enum buttonType {
     TAPPED,
-    TOGGLED,
     PRESSED,
-    TAP_AND_PRESS,
 };
 
 enum DebounceState {
