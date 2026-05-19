@@ -28,4 +28,4 @@ The goal was to get a basic skeleton that worked. This involved an if-else tree 
 The program was completely restructured. A button struct held the properties of each button so the name, pin, command, type (tapped, pressed), and debounce variables. This allowed for a debounce FSM to be implemented. A construct function was then able to define every button's properties modularly.
 
 ## Schematic
-<img width="808" height="501" alt="image" src="https://github.com/user-attachments/assets/acdf3180-b2ea-4c29-97d9-1294470191ae" />
+[In Progress]
