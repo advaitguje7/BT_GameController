@@ -4,7 +4,7 @@ This is a program to play games via Bluetooth using an ESP-32. It is designed ar
 - [x] General eatures of an xbox/playstation controller (ABXY, triggers, D-pad, buttons)
 - [x] Compatable with iOS
 - [ ] Non-blocking Joystick Control (in progress)
-- [ ] Untested with any other platform
+- [ ] Untested with any other platform (Andriod, Windows, etc)
 
 ## DevLog
 
