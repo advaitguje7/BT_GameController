@@ -22,7 +22,7 @@ The goal was to get a basic skeleton that worked. This involved an if-else tree 
 - [x] Created separate `Buttons` and `Joystick` files to hold specific functions in the HAL
 #### Non-Blocking Code
 - [x] Defined dedicated read/write functions for each section of the controller to poll each input once every loop iteration.
-- [x] Replaced  `delay()` with software timers (using `millis()` and a Finite State Machine (FSM) to debounce buttons.
+- [x] Replaced  `delay()` with software timers (using `millis()`) and a Finite State Machine (FSM) to debounce buttons.
 - [x] Added  separate `tap` and `pressed` logic for modular button handling.
 
 The program was completely restructured. A button struct held the properties of each button so the name, pin, command, type (tapped, pressed), and debounce variables. This allowed for a debounce FSM to be implemented. A construct function was then able to define every button's properties modularly.
