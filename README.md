@@ -12,7 +12,7 @@ This is a program to play games via Bluetooth using an ESP-32. It is designed ar
 - [x] Basic motion: strafing (buttons), looking around (joystick 1)
 - [x] Advanced Motion: Run linear and translational motion simultaneously (look around while walking)
 - [x] Hardware-based Changes: Replace buttons with a second joystick, implement ABXY control with buttons, add other buttons (LT, RT, LB, RB)
-- [x] Optimization: Improve deadzones, turn speeds, and implement device naming functionality
+- [ ] Optimization: Improve deadzones, turn speeds, and implement device naming functionality
 
 The goal was to get a basic skeleton that worked. This involved an if-else tree that polled every single input and either pressed or released each corresponding command. The program worked, although multiple delay() uses blocked the code. The controller was also not especially sensitive due to these delays.
 
