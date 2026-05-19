@@ -25,7 +25,7 @@ void Button_construct(Button* button, String name, int pin, int command, buttonT
 void Button_refresh(Button* button) 
 {
   int rawButtonStatus = digitalRead(button->pin);
-  int newPushState = INACTIVE;
+  int newPushState = HIGH;
 
   switch (button->debounceState) {
 

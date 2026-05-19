@@ -1,13 +1,15 @@
 /* TODO
+-> Action Buttons (ABXY)
 -> Joysticks
+-> Triggers
 -> Back Buttons
 -> Dpad
--> Triggers
+-> Reset
 */
 
 /* Questions 
--> For commands, is it better to define or initialize in construct?
--> Is it still spagetti code?
+-> For commands, is it better to define or initialize in construct? [#define is better because otherwise you have magic numbers]
+-> Is it still spagetti code? [No - separated code for controls into buttons.h, implemented HAL_refresh and button constructs, and button types]
 */
 
 /* Features
@@ -24,10 +26,10 @@
 #define xPin 14
 
 /*Action Button Commands*/
-#define aCommand 32 // 0x20 | jump
-#define bCommand 122 // drop item
-#define xCommand 99 // inventory
-#define yCommand 0 // undetermined
+#define COMMAND_A 32 // ' ' [space] (jump)
+#define COMMAND_B 122 // 'z' (drop item)
+#define COMMAND_X 99 // 'c' (inventory)
+#define COMMAND_Y 0 // undetermined
 
 /*D-Pad*/
 #define dpadUpPin 21
@@ -40,17 +42,19 @@
 #define rightTriggerPin 18
 
 /*Trigger Commands*/
-#define leftTriggerCommand 101 // place/use
-#define rightTriggerCommand 113 // attack/destroy
+#define COMMAND_LT 101 // 'e' (place/use)
+#define COMMAND_RT 113 // 'q' (attack/destroy)
 
 /*Back Buttons*/
 #define leftButtonPin 22
 #define rightButtonPin 23
 
 /*Back Button Commands*/
+#define COMMAND_LB KEY_PAGE_UP // page up (cycle left)
+#define COMMAND_RB KEY_PAGE_DOWN // page down (cycle right)
 
 // Hard Coded Macros
-#define NUM_BUTTONS 4
+#define M_NUM_BUTTONS 8
 #define M_DELAY 50
 
 typedef struct Application {
@@ -63,11 +67,12 @@ typedef struct Application {
     Button xButton;
     Button yButton;
 
-    // Button leftTrigger;
-    // Button rightTrigger;
+    Button leftTrigger;
+    Button rightTrigger;
 
-    // Button leftButton;
-    // Button rightButton;
+    Button leftButton;
+    Button rightButton;
+
 } Application;
 
 Application Application_construct();
@@ -100,8 +105,8 @@ void readJoystickButtons(Application* app);
 // taps the button
 void tap_button(Button* pin);
 
-// toggles the button
-void toggle_button(Button* pin);
-
 // presses the button
 void press_button(Button* pin);
+
+// toggles the button
+void toggle_button(Button* pin);
