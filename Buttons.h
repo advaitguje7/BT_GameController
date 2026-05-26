@@ -4,12 +4,12 @@
 #define INACTIVE 1
 #define ACTIVE 0
 
-enum buttonType {
+enum ButtonType {
     TAPPED,
     PRESSED,
 };
 
-enum DebounceState {
+enum _DebounceState {
   StableR,
   StableP,
   TransitionRP,
@@ -24,21 +24,21 @@ struct Button {
   int pushState;
   bool isTapped;
 
-  DebounceState debounceState;
+  _DebounceState debounceState;
 
   unsigned long timerStart;
   unsigned long debounceDelay;
 
   // controls
   String name;
-  buttonType type;
+  ButtonType type;
   int command;
   bool firstCall;
   bool wasPressed;
 };
 
 // constructs the button
-void Button_construct(Button* button, String name, int pin, int command, buttonType type);
+void Button_construct(Button* button, String name, int pin, int command, ButtonType type);
 
 // determines if the button is tapped
 bool Button_isTapped(Button* button);

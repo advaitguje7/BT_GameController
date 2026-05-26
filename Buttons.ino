@@ -4,7 +4,7 @@
 */
 #include "Buttons.h"
 
-void Button_construct(Button* button, String name, int pin, int command, buttonType type) 
+void Button_construct(Button* button, String name, int pin, int command, ButtonType type) 
 {
   button->name = name;
   button->pin = pin;
