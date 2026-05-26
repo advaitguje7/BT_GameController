@@ -25,7 +25,7 @@ The goal was to get a basic skeleton that worked. This involved an if-else tree 
 - [x] Replaced  `delay()` with software timers (using `millis()`) and a Finite State Machine (FSM) to debounce buttons.
 - [x] Added  separate `tap` and `pressed` logic for modular button handling.
 
-The program was completely restructured. A button struct held the properties of each button so the name, pin, command, type (tapped, pressed), and debounce variables. This allowed for a debounce FSM to be implemented. A construct function was then able to define every button's properties modularly.
+The program was completely restructured. A button struct held the properties of each button so the name, pin, command, type (tapped, pressed), and debounce variables. This allowed for a debounce FSM. A construct function was then able to define every button's properties.
 
 ## Schematic
 [In Progress]
