@@ -30,4 +30,5 @@ This is a program to play games via Bluetooth using an ESP-32. It is designed ar
 - [x] Replaced `delay()` with software timers for debouncing.
 
 ## Schematic
-[In Progress]
+<img width="1197" height="464" alt="image" src="https://github.com/user-attachments/assets/3898cdbf-273c-45b4-b092-347c082575e3" />
+
