@@ -14,13 +14,13 @@ This is a program to play games via Bluetooth using an ESP-32. It is designed ar
 
 ## DevLog
 
-### [1/31/26] - V.1
+### [1/31/26] - V1
 - [x] Basic motion: strafing (buttons), looking around (joystick 1)
 - [x] Advanced Motion: Run linear and translational motion simultaneously (look around while walking)
 - [x] Hardware-based Changes: Replace buttons with a second joystick, implement ABXY control with buttons, add other buttons (LT, RT, LB, RB)
 - [ ] Optimization: Improve deadzones, turn speeds, and implement device naming functionality
 
-### [5/12/26] - V.2
+### [5/12/26] - V2
 #### Modular Architecture
 - [x] Structs hold the properties of a given input, including pin addresses, commands, debounce states, and button behaviors.
 - [x]  `Construct` functions to allow the user to define said properties
