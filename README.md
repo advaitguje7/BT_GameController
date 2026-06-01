@@ -1,7 +1,7 @@
 This is a program to play games via Bluetooth using an ESP-32. It is designed around Minecraft's default binds, but the controls are modular. Note that this program uses the BleKeyboard library, which requires you to downgrade the ESP-32 version to 2.0.17. This program was designed for iOS, with other platforms untested as of writing this (5/18/26).
 
 ## Features
-- [ ] Standard features of an xbox/playstation controller
+- [x] Standard features of a game controller
   - [x] ABXY
   - [x] D-Pad
   - [x] Triggers
