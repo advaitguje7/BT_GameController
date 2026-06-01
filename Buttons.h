@@ -4,7 +4,7 @@
 #define INACTIVE 1
 #define ACTIVE 0
 
-enum ButtonType {
+enum _ButtonType {
     TAPPED,
     PRESSED,
 };
@@ -16,7 +16,7 @@ enum _DebounceState {
   TransitionPR
 };
 
-struct Button {
+struct _Button {
 
   // buttons
   int pin;
@@ -31,20 +31,20 @@ struct Button {
 
   // controls
   String name;
-  ButtonType type;
+  _ButtonType type;
   int command;
   bool firstCall;
   bool wasPressed;
 };
 
 // constructs the button
-void Button_construct(Button* button, String name, int pin, int command, ButtonType type);
+void Button_construct(_Button* button, String name, int pin, int command, _ButtonType type);
 
 // determines if the button is tapped
-bool Button_isTapped(Button* button);
+bool Button_isTapped(_Button* button);
 
 // determines if the button is pressed 
-bool Button_isPressed(Button* button);
+bool Button_isPressed(_Button* button);
 
 #endif
 

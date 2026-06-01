@@ -4,7 +4,7 @@
 */
 #include "Buttons.h"
 
-void Button_construct(Button* button, String name, int pin, int command, ButtonType type) 
+void Button_construct(_Button* button, String name, int pin, int command, _ButtonType type) 
 {
   button->name = name;
   button->pin = pin;
@@ -19,10 +19,14 @@ void Button_construct(Button* button, String name, int pin, int command, ButtonT
   button->timerStart = 0;
   button->debounceDelay = 50;
 
-  pinMode(pin, INPUT_PULLUP);
+  if (pin < 34) {
+    pinMode(pin, INPUT_PULLUP);
+  } else {
+    pinMode(pin, INPUT);
+  }
 }
 
-void Button_refresh(Button* button) 
+void Button_refresh(_Button* button) 
 {
   int rawButtonStatus = digitalRead(button->pin);
   int newPushState = HIGH;
@@ -70,6 +74,6 @@ void Button_refresh(Button* button)
   button->pushState = newPushState;
 }
 
-bool Button_isPressed(Button* button) { return button->pushState == LOW; }
+bool Button_isPressed(_Button* button) { return button->pushState == LOW; }
 
-bool Button_isTapped(Button* button) { return button->isTapped; }
+bool Button_isTapped(_Button* button) { return button->isTapped; }

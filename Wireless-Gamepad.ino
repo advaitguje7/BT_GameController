@@ -2,15 +2,11 @@
 #include <string>
 
 /*HAL and Application Includes*/
-#include "BT_Controller.h"
+#include "Wireless-Gamepad.h"
 #include "Buttons.h"
 #include "Joystick.h"
 #include <BleKeyboard.h>
 #include <BleGamepad.h>
-
-int ledState = LOW;          
-unsigned long previousMillis = 0;     
-unsigned long interval = 1000UL;  
 
 BleKeyboard bleKeyboard("BTGC", "advaitguje7", 100);
 // BleGamepad bleGamepad("BTGC", "advaitguje7", 100);
@@ -21,15 +17,14 @@ Application app;
 void setup() {
   Serial.begin(115200);
   bleKeyboard.begin(); 
-  app = Application_construct();
-  pinMode(ledPin, OUTPUT);      
+  app = Application_construct();    
 
 }
 
 void loop() {
 
   if (bleKeyboard.isConnected()) {
-    digitalWrite(ledPin, HIGH);
+    // digitalWrite(ledPin, HIGH);
     if (app.firstCall) {
       Serial.println("[Device Connected]");
       app.firstCall = false;
@@ -41,13 +36,17 @@ void loop() {
     readWriteTriggers(&app);
     readWriteBackButtons(&app);
     readWriteHats(&app);
+    readJoysticks(&app);
+    writeJoysticks(&app);
+
+    delay(10);
 
   } else {
     if (!app.firstCall) {
       Serial.println("[Device Disconnected]");
       app.firstCall = true;
+      delay(500);
     }
-    blinkLED();
   }
 }
 
@@ -70,8 +69,15 @@ void setupButtons(Application* app)
   Button_construct(&app->hatRightButton, "HAT_RIGHT", PIN_HAT_RIGHT, COMMAND_HAT_RIGHT, TAPPED);
 }
 
+void setupJoysticks(Application* app)
+{
+  Joystick_construct(&app->leftJoystick, "LS", PIN_LS_X, PIN_LS_Y, PIN_LS_JSB, COMMAND_LS_X_LEFT, COMMAND_LS_X_RIGHT, COMMAND_LS_Y_UP, COMMAND_LS_Y_DOWN, COMMAND_LS_JSB); 
+  Joystick_construct(&app->rightJoystick, "RS", PIN_RS_X, PIN_RS_Y, PIN_RS_JSB, COMMAND_RS_X_LEFT, COMMAND_RS_X_RIGHT, COMMAND_RS_Y_UP, COMMAND_RS_Y_DOWN, COMMAND_RS_JSB);                                                                               // !!!
+}
+
 Application Application_construct() {
     setupButtons(&app);
+    setupJoysticks(&app);
     app.firstCall = true;
 
     return app;
@@ -93,9 +99,13 @@ void HAL_refresh(Application* app){
   Button_refresh(&app->hatDownButton);
   Button_refresh(&app->hatLeftButton);
   Button_refresh(&app->hatRightButton);
+
+  Button_refresh(&app->leftJoystick.jsb);
+  Button_refresh(&app->rightJoystick.jsb);
+
 }
 
-void tap_button(Button* button) 
+void tap_button(_Button* button) 
 {
   if (button->type != TAPPED) return;
 
@@ -105,7 +115,10 @@ void tap_button(Button* button)
   }
 }
 
-void press_button(Button* button) 
+
+
+
+void press_button(_Button* button) 
 {
   if (button->type != PRESSED) return;
 
@@ -144,41 +157,72 @@ void readWriteBackButtons(Application* app)
 void readWriteHats(Application* app)
 {
   tap_button(&app->hatUpButton);
-  tap_button(&app->hatDownButton);
+  press_button(&app->hatDownButton);
   tap_button(&app->hatLeftButton); 
   tap_button(&app->hatRightButton);
 }
 
-
-void blinkLED()
-/*
-  Blink
-  Turns on an LED on for one second, then off for one second, repeatedly.
- 
-  Original Concept: Tom Igoe
-  Original Code: David A. Mellis, Arduino Core Team
-  Adapted by: Advait Guje 
-  
-  This example code is in the public domain.
-  Original source: https://www.arduino.cc/en/Tutorial/Blink
-*/
+void readJoysticks(Application* app)
 {
-    if (millis() - previousMillis > interval) 
-  {
-    // save the last time you blinked the LED
-    previousMillis += interval;  
+  app->leftJoystick.x = readAnalogAxisLevel(PIN_LS_X); 
+  app->leftJoystick.y = readAnalogAxisLevel(PIN_LS_Y);
+  app->leftJoystick.jsb.isTapped = Button_isTapped(&app->leftJoystick.jsb);
+ 
+  app->rightJoystick.x = readAnalogAxisLevel(PIN_RS_X); 
+  app->rightJoystick.y = readAnalogAxisLevel(PIN_RS_Y);   
+  app->rightJoystick.jsb.isTapped = Button_isTapped(&app->rightJoystick.jsb); 
+}
 
-    // if the LED is off turn it on and vice-versa:
-    if (ledState == LOW)
-    {
-      ledState = HIGH;
-    }
-    else
-    {
-      ledState = LOW;
-    }
+void writeJoysticks(Application* app)
+{
+  tap_joystick(&app->leftJoystick);
+  tap_joystick(&app->rightJoystick);
+}
 
-    // set the LED with the ledState of the variable:
-    digitalWrite(ledPin, ledState);
+void tap_joystick(_Joystick* joystick) 
+{
+  if (joystick->x < THRESHOLD_MIN) {
+    bleKeyboard.press(joystick->command_x_left);
+
+    Serial.print(joystick->name);
+    Serial.print(":\t");
+    Serial.println("LEFT");
+  } else {
+    bleKeyboard.release(joystick->command_x_left);
+  }
+
+  if (joystick->x > THRESHOLD_MAX) {
+    bleKeyboard.press(joystick->command_x_right);
+
+    Serial.print(joystick->name);
+    Serial.print(":\t");
+    Serial.println("RIGHT");
+  } else {
+    bleKeyboard.release(joystick->command_x_right);
+  }
+
+  if (joystick->y < THRESHOLD_MIN) {
+    bleKeyboard.press(joystick->command_y_down);
+
+    Serial.print(joystick->name);
+    Serial.print(":\t");
+    Serial.println("DOWN");
+  } else {
+    bleKeyboard.release(joystick->command_y_down);
+  }
+
+  if (joystick->y > THRESHOLD_MAX) {
+    bleKeyboard.press(joystick->command_y_up);
+
+    Serial.print(joystick->name);
+    Serial.print(":\t");
+    Serial.println("UP");
+  } else {
+    bleKeyboard.release(joystick->command_y_up);
   }
 }
+
+byte readAnalogAxisLevel(int pin) 
+{ 
+	 return map(analogRead(pin), 0, 4095, 0, 255); 
+} 

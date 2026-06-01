@@ -1,11 +1,12 @@
 /* TODO
 -> Action Buttons (ABXY) [x]
--> Joysticks
 -> Triggers [x]
 -> Back Buttons [x]
--> Dpad
+-> Dpad [x]
+-> LED [x]
+-> Joysticks [x]
 -> Power Supply
--> LED
+-> Keyboard VS Gamepad modes
 */
 
 /* Questions 
@@ -22,29 +23,41 @@
 #include "Buttons.h"
 #include "Joystick.h"
 
-/*Action Buttons*/
-#define PIN_A 32
-#define PIN_B 33
-#define PIN_X 25
-#define PIN_Y 26
+/*Action Buttons [4]*/
+#define PIN_A 14
+#define PIN_B 27
+#define PIN_X 26
+#define PIN_Y 25
 
+/*Triggers [2]*/
+#define PIN_LT 23 K
+#define PIN_RT 13
 
-/*Triggers*/
-#define PIN_LT 22
-#define PIN_RT 34
+/*Back Buttons [2]*/
+#define PIN_LB 15
+#define PIN_RB 12
 
-/*Back Buttons*/
-#define PIN_LB 23
-#define PIN_RB 35
-
-/*D-Pad*/
-#define PIN_HAT_UP 21
-#define PIN_HAT_DOWN 5
+/*D-Pad [4]*/
+#define PIN_HAT_UP 4
+#define PIN_HAT_DOWN 19
+#define PIN_HAT_LEFT 5
 #define PIN_HAT_RIGHT 18
-#define PIN_HAT_LEFT 19
 
-/*Led*/
-#define ledPin 13
+/*Joysticks [2]*/
+#define PIN_LS_X 35
+#define PIN_LS_Y 34
+#define PIN_LS_JSB 21
+
+#define PIN_RS_X 33
+#define PIN_RS_Y 32
+#define PIN_RS_JSB 22
+
+/*Control [2]*/
+#define PIN_START 0
+#define PIN_MENU 0
+
+/*Outputs [1]*/
+// #define ledPin 34
 
 /*Action Button Commands*/
 
@@ -89,30 +102,45 @@
 #define COMMAND_HAT_LEFT 98 // 'b' (emote)
 #define COMMAND_HAT_RIGHT 116 // 't' (chat)
 
+/*Joystick Commands*/
+#define COMMAND_LS_X_RIGHT 0
+#define COMMAND_LS_X_LEFT 0
+#define COMMAND_LS_Y_UP 0
+#define COMMAND_LS_Y_DOWN 0
+#define COMMAND_LS_JSB 0
+
+#define COMMAND_RS_X_RIGHT 0
+#define COMMAND_RS_X_LEFT 0
+#define COMMAND_RS_Y_UP 0
+#define COMMAND_RS_Y_DOWN 0
+#define COMMAND_RS_JSB 0
+
 // Hard Coded Macros
-#define M_NUM_BUTTONS 8
-#define M_DELAY 50
+#define M_NUM_BUTTONS 16
 
 typedef struct Application {
 
     // bools
     bool firstCall;
     // Button
-    Button aButton;
-    Button bButton;
-    Button xButton;
-    Button yButton;
+    _Button aButton;
+    _Button bButton;
+    _Button xButton;
+    _Button yButton;
 
-    Button leftTrigger;
-    Button rightTrigger;
+    _Button leftTrigger;
+    _Button rightTrigger;
 
-    Button leftButton;
-    Button rightButton;
+    _Button leftButton;
+    _Button rightButton;
 
-    Button hatUpButton;
-    Button hatDownButton;
-    Button hatLeftButton;
-    Button hatRightButton;
+    _Button hatUpButton;
+    _Button hatDownButton;
+    _Button hatLeftButton;
+    _Button hatRightButton;
+
+    _Joystick leftJoystick;
+    _Joystick rightJoystick;
 
 } Application;
 
@@ -122,37 +150,42 @@ typedef struct Application {
 // };
 
 Application Application_construct();
-Application Application_loop();         
 
 // Initializes variables for the buttons
 void setupButtons(Application* app);
 
+// Initializes variables for the buttons
+void setupJoysticks(Application* app);
+
 // refreshes a button every cycle
-void Button_refresh(Button* button);
+void Button_refresh(_Button* button);
 
 // refreshes the entire HAL
 void HAL_refresh(Application* app);
 
 // taps the button
-void tap_button(Button* pin);
+void tap_button(_Button* pin);
 
 // presses the button
-void press_button(Button* pin);
+void press_button(_Button* pin);
 
-// reads the action buttons and executes its according command
+// taps the joystick
+void tap_joystick(_Joystick* joystick);
+
+// reads the action buttons and executes corresponding commands
 void readWriteABXY(Application* app);
 
-// reads the triggers buttons and executes its according command
+// reads the triggers buttons and executes corresponding commands
 void readWriteTriggers(Application* app);
 
-// reads the back buttons and executes its respective command
+// reads the back buttons and executes corresponding commands
 void readWriteBackButtons(Application* app);
 
-// reads the D-Pad buttons and returns which one was pressed
+// reads the D-Pad buttons and executes corresponding commands
 void readWriteHats(Application* app);
 
-// reads the joystick buttons and returns which one was pressed
-void readJoystickButtons(Application* app);
+// samples the joysticks
+void readJoysticks(Application* app);
 
-// blinks LED
-void blinkLED();
+// executes corresponding commands
+void writeJoysticks(Application* app);
